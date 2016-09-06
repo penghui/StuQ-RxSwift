@@ -27,11 +27,28 @@ class TapViewController: UIViewController {
         super.viewDidLoad()
         button.addTarget(self, action: #selector(TapViewController.buttonTap), forControlEvents: .TouchUpInside)
 
-        rxButton
+/*        rxButton
             .rx_tap
             .map { return 1 }
             .scan(0, accumulator: +)
 //            .startWith(0)
+            .subscribeNext { (count) in
+                print(count)
+                self.rxLabel.text = "\(count)"
+            }
+            .addDisposableTo(disposeBag) */
+
+	Observable
+            .of(rxButton.rx_tap.map{return 1}, rxReset.rx_tap.map{return 0})
+            .merge()
+            .scan(0, accumulator: {(acc, i) in
+                print(i, acc)
+                if i > 0 {
+                    return acc + i;
+                } else {
+                    return 0;
+                }
+            })
             .subscribeNext { (count) in
                 print(count)
                 self.rxLabel.text = "\(count)"
